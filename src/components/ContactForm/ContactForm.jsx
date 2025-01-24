@@ -1,14 +1,15 @@
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { useDispatch, useSelector } from 'react-redux';
-import { nanoid } from 'nanoid';
-import { addContact } from '../../redux/contactsSlice';
+import { addContact } from '../../redux/contactsOps';
 import { selectContacts } from '../../redux/selectors';
+import { selectError } from '../../redux/contactsSlice';
 import styles from './ContactForm.module.css';
 
 const ContactForm = () => {
   const dispatch = useDispatch();
   const contacts = useSelector(selectContacts);
+  const error = useSelector(selectError);
 
   const formik = useFormik({
     initialValues: {
@@ -36,12 +37,7 @@ const ContactForm = () => {
         return;
       }
 
-      dispatch(
-        addContact({
-          id: nanoid(),
-          ...values,
-        })
-      );
+      dispatch(addContact(values));
       resetForm();
     },
   });
@@ -64,7 +60,6 @@ const ContactForm = () => {
       {formik.touched.name && formik.errors.name ? (
         <div className={styles.error}>{formik.errors.name}</div>
       ) : null}
-
       <label htmlFor="number" className={styles.label}>
         Number
       </label>
@@ -81,6 +76,7 @@ const ContactForm = () => {
       {formik.touched.number && formik.errors.number ? (
         <div className={styles.error}>{formik.errors.number}</div>
       ) : null}
+      {error && <div className={styles.error}>Error: {error}</div>}{' '}
       <button type="submit" className={styles.submitBtn}>
         Add Contact
       </button>
